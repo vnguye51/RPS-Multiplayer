@@ -1,0 +1,7 @@
+*RPS online
+
+*Don't let users choose what player they are. Just have a JOIN button and automatically assign them their player
+
+*edge cases to fix
+    *remove ability to interact with screen until after the first update occurs ( don't add buttons until the first load)
+    *remove timing. player one is always the first to join

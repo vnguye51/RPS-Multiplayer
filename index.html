@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang = 'en-us'>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"> 
+    <title>RPS Multiplayer</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+
+
+<body>
+    <div id='playerDisplay'>You are spectating</div>
+    <div id='victor' hidden></div>
+    <button id='P1' class='choosePlayer' data='1'>JOIN</button>
+    <div id='roundTimer'></div>
+    <div id='choiceBox' hidden>
+        <button id='R' class = 'RPS' data = 'r'>R</button>
+        <button id='P' class = 'RPS' data = 'p'>P</button>
+        <button id='S' class = 'RPS' data = 's'>S</button>
+        <div id='YourChoice' hidden></div>
+    </div>
+
+    <div id='gameBox'></div>
+    <div id='chatBox'>
+        <div id ='chat'></div>
+        <input type='text' id='textBox'>
+        <button id='inputButton'>SEND</button>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCEf7hUZHNmRWu9g9NvdHHJAElS3bUuq_s",
+        authDomain: "test-ec53d.firebaseapp.com",
+        databaseURL: "https://test-ec53d.firebaseio.com",
+        projectId: "test-ec53d",
+        storageBucket: "test-ec53d.appspot.com",
+        messagingSenderId: "963771944957"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type='text/javascript' src='assets/javascript/app.js'></script>
+</body>
+
