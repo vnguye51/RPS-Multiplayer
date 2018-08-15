@@ -15,20 +15,24 @@ var choicesObj = {
     playerTwo: ''
 }
 
+var imagesObj ={
+    playerOne: '',
+    playerTwo: '',
+}
+
 var choice = ''
+
 var username = ''
 
-// $(window).on('unload',(function(){
-//     if (player == 1){
-//         playerObj.playerOne = 0
-//         choicesObj.playerOne = ''
-//     }
-//     else if (player == 2){
-//         playerObj.playerTwo = 0
-//         choicesObj.playerTwo = ''
-//     }
+var namesObj = {
+    playerOne: '(Player1)',
+    playerTwo: '(Player2)'
+}
 
-// }))
+var scoreObj = {
+    playerOne: 0,
+    playerTwo: 0,
+}
 
 $('.choosePlayer').on('click',function(event){
     $('#P1').attr('hidden',true)
@@ -37,24 +41,27 @@ $('.choosePlayer').on('click',function(event){
         player = 1
         playerObj.playerOne = 1
         username =  $('#username').val() + '(Player1)'
-        $('#playerDisplay').html('You are PLAYER ONE')
+        namesObj.playerOne = username
+        $('#playerDisplay').attr('hidden',true)
     }
     else if(playerObj.playerTwo == 0){
         player = 2
         playerObj.playerTwo = 1 
         username =  $('#username').val() + '(Player2)'
-        $('#playerDisplay').html('You are PLAYER TWO')
+        namesObj.playerTwo = username
+        $('#playerDisplay').attr('hidden',true)
     }
     else{
         username =  $('#username').val() + '(spectator)'
-    }//No more room for players
-    
+    }
+
     $('.choosePlayer').attr('hidden',true)
     if(player != 0){
         $('#choiceBox').removeAttr('hidden')
     }
-    $('#username').attr('hidden',true)
+    $('#joinbox').attr('hidden',true)
     database.ref('users').set(playerObj)
+    database.ref('names').set(namesObj)
 
 })
 
@@ -66,43 +73,155 @@ $('.RPS').on('click',function(){
     else if (player == 2){
         choicesObj.playerTwo = choice
     }
+    grabGiphy(choice,player)
     $('#YourChoice').html('YOU CHOSE ' + choice).removeAttr('hidden')
     $('.RPS').attr('hidden',true)
     database.ref('choices').set(choicesObj)
-    
-   
+})
+
+database.ref('score').on('value',function(snapshot){
+    scoreObj = snapshot.val()
+    $('#P1Score').html('WINS: ' + scoreObj.playerOne)
+    $('#P2Score').html('WINS: ' + scoreObj.playerTwo)
+
+    if (player == 1){
+        database.ref('choices').onDisconnect().set({
+            playerOne: 0,
+            playerTwo: scoreObj.playerTwo,
+        })
+    }
+    else{
+        database.ref('choices').onDisconnect().set({
+            playerOne: scoreObj.playerOne,
+            playerTwo: 0,
+        })
+    }
+})
+
+database.ref('names').on('value',function(snapshot){
+    namesObj = snapshot.val()
+    $('#P1Name').html(namesObj.playerOne)
+    $('#P2Name').html(namesObj.playerTwo)
+
+    if (player == 1){
+        database.ref('names').onDisconnect().set({
+            playerOne: '(Player1)',
+            playerTwo: namesObj.playerTwo,
+        })
+    }
+    else{
+        database.ref('names').onDisconnect().set({
+            playerOne: namesObj.playerOne,
+            playerTwo: '(Player2)',
+        })
+    }
+})
+
+database.ref('images').on('value',function(snapshot){
+    imagesObj = snapshot.val()
+    $('#P1Image').attr('src',imagesObj.playerOne)
+    $('#P2Image').attr('src',imagesObj.playerTwo)
+
+    if (player == 1){
+        database.ref('images').onDisconnect().set({
+            playerOne: '',
+            playerTwo: imagesObj.playerTwo,
+        })
+    }
+    else if (player == 2){
+        database.ref('images').onDisconnect().set({
+            playerOne: imagesObj.playerOne,
+            playerTwo: '',
+        })
+    }
 })
 
 database.ref('chat').on('child_added',function(snapshot){
+    var scrolled = $('#chat').prop('scrollTop')
+    var scrollHeight = $('#chat').prop('scrollHeight') - $('#chat').prop('offsetHeight')
+
+   if (scrolled >= scrollHeight){
     $('#chat').append(snapshot.val().msg)
     $('#chat').append('<br>')
+    $('#chat').scrollTop($('#chat').prop('scrollHeight') - $('#chat').prop('offsetHeight'))
+   }
+   else{
+    $('#chat').append(snapshot.val().msg)
+    $('#chat').append('<br>')
+}
+
+
 })
 
 
 database.ref('choices').on('value',function(snapshot){
     choicesObj = snapshot.val()
+    if (player==1 && choicesObj.playerOne!=''){
+        $('#P1Image').removeAttr('hidden')
+    }
+    if (player==2 && choicesObj.playerTwo!=''){
+        $('#P2Image').removeAttr('hidden')
+    }
+
     if (choicesObj.playerOne != '' && choicesObj.playerTwo != ''){
-        checkVictor(choicesObj.playerOne,choicesObj.playerTwo)
-        choicesObj.playerOne = ''
-        choicesObj.playerTwo = ''
-        $('#YourChoice').attr('hidden',true)
-        database.ref('choices').set(choicesObj)
-        if(player != 0){
-            console.log('a')
-            $('.RPS').removeAttr('hidden')
+        var victor = checkVictor(choicesObj.playerOne,choicesObj.playerTwo)
+        if (victor == 0){
+            $('#victor').html('TIE GAME')
         }
+        else if (player == 0){
+            if (victor == 1){
+                $('#victor').html(namesObj.playerOne + ' WINS')
+            }
+            else{
+                $('#victor').html(namesObj.playerTwo + ' WINS')
+            }
+        }
+        else if (victor == player){
+            $('#victor').html('YOU WIN')
+        }
+        else{
+            $('#victor').html('YOU LOSE')
+        }
+        if (victor == 1){
+            scoreObj.playerOne++
+        }
+        else if (victor == 2){
+            scoreObj.playerTwo++
+        }
+
+        database.ref('score').set(scoreObj)
+
+        $('#victor').removeAttr('hidden')
+        $('#P2Image').removeAttr('hidden')
+        $('#P1Image').removeAttr('hidden')
+        setTimeout(function(){
+            choicesObj.playerOne = ''
+            choicesObj.playerTwo = ''
+            imagesObj.playerOne = ''
+            imagesObj.playerTwo = ''
+            database.ref('choices').set(choicesObj)
+            database.ref('images').set(imagesObj)
+            $('#P2Image').attr('hidden',true)
+            $('#P1Image').attr('hidden',true)
+            $('#YourChoice').attr('hidden',true)
+            $('#victor').attr('hidden',true)
+            
+            if(player != 0){
+                $('.RPS').removeAttr('hidden')
+            }
+        },5000)
     }
 
     
     if (player == 1){
         database.ref('choices').onDisconnect().set({
             playerOne: '',
-            playerTwo: playerChoices.playerTwo,
+            playerTwo: choicesObj.playerTwo,
         })
     }
     else if (player == 2){
         database.ref('choices').onDisconnect().set({
-            playerOne: playerChoices.playerOne,
+            playerOne: choicesObj.playerOne,
             playerTwo: '',
         })
     }
@@ -129,42 +248,50 @@ $('#inputButton').on('click',function(){
     database.ref('chat').push({
         msg: username + ': ' + $('#textBox').val()
     })
-    // $('#chat').append($('#textBox').val())
-    // $('#chat').append('<br>')
+
 })
 
 
 function checkVictor(choice1,choice2){
-    if ((choice1 === "r") && (choice2 === "s")) {
-        win()
-    } else if ((choice1 === "r") && (choice2 === "p" || choice2 == '')) {
-        lose()
-    } else if ((choice1 === "s") && (choice2 === "r" || choice2 == '')) {
-        lose()
-    } else if ((choice1 === "s") && (choice2 === "p" || choice2 == '')) {
-        win()
-    } else if ((choice1 === "p") && (choice2 === "r" || choice2 == '')) {
-        win()
-    } else if ((choice1 === "p") && (choice2 === "s" || choice2 == '')) {
-        lose()
+    if ((choice1 === "rock") && (choice2 === "scissors")) {
+        return 1
+    } else if ((choice1 === "rock") && (choice2 === "paper" || choice2 == '')) {
+        return 2
+    } else if ((choice1 === "scissors") && (choice2 === "rock" || choice2 == '')) {
+        return 2
+    } else if ((choice1 === "scissors") && (choice2 === "paper" || choice2 == '')) {
+        return 1
+    } else if ((choice1 === "paper") && (choice2 === "rock" || choice2 == '')) {
+        return 1
+    } else if ((choice1 === "paper") && (choice2 === "scissors" || choice2 == '')) {
+        return 2
     } else if (choice1 === choice2) {
-        tie()
+        return 0
     }
 }
 
-function win(){
-    $('#victor').removeAttr('hidden')
-    $('#victor').html('PLAYER ONE WINS')
+
+
+function grabGiphy(s,player){
+
+    if(s == 'rock'){
+        s = 'boulder'
+    }
+
+    var queryURL = "https://api.giphy.com/v1/gifs/random?tag=" +
+      s + "&api_key=dc6zaTOxFJmzC";
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+        .then(function(response) {
+          var image = response.data.image_url;
+          if (player == 1){
+              imagesObj.playerOne = image
+          }
+          else{
+              imagesObj.playerTwo = image
+          }
+          database.ref('images').set(imagesObj)
+    })
 }
-
-function lose(){
-    $('#victor').removeAttr('hidden')
-    $('#victor').html('PLAYER TWO WINS')
-}
-
-function tie(){
-    $('#victor').removeAttr('hidden')
-    $('#victor').html('TIE')
-}
-
-

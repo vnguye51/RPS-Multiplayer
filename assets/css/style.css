@@ -1,4 +1,76 @@
+*{  
+    box-sizing: border-box;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    background-image: url('../images/wavy-dots.png')
+}
+
+img{
+    height: 260px;
+    width: 75%;
+}
+
 #chat{
-    overflow: scroll;
+    text-align: left;
+    overflow-y: scroll;
     height: 200px;
+    margin: 5px 20px;
+    border: solid black 2px;
+}
+
+.playerBox{
+    position: relative;
+    border: solid gray 2px;
+    width: 50%;
+    float: left;
+    height: 356px;
+}
+/* #P2Box{
+    position: relative;
+    width: 50%;
+    height: 356px;
+    border: solid gray 2px;
+    float: right;
+} */
+
+#textBox{
+    text-align: left;
+    width: 85%
+}
+
+#sendBox{
+    text-align: left;
+    margin: 0px 20px;
+}
+
+#gameBox{
+    height: 360px;
+    margin: 5px 20px;
+    border: solid black 2px;
+}
+#title{
+    padding: 10px;
+    font-size: 36px;
+}
+
+
+
+.score{
+    width: 100%;
+    position: absolute;
+    bottom: 15px;
+}
+
+.name{
+    font-size: 24px;
+    margin: 8px;
+}
+
+.RPS{
+    font-size: 24px;
+    width: 15%;
+}
+
+#victor{
+    font-size: 36px;
 }

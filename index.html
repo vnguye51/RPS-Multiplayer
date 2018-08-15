@@ -12,25 +12,42 @@
 
 
 <body>
+    <div id='title'>ROCK! PAPER! SCISSORS!</div>
     <div id='playerDisplay'>You are spectating</div>
+    <div id='YourChoice' hidden></div>
     <div id='victor' hidden></div>
     <div id ='joinbox'>
-        <input type='text' id='username'>
+        
+        USERNAME: <input type='text' id='username'>
+
         <button id='P1' class='choosePlayer' data='1'>JOIN</button>
     </div>
     <div id='roundTimer'></div>
     <div id='choiceBox' hidden>
-        <button id='R' class = 'RPS' data = 'r'>R</button>
-        <button id='P' class = 'RPS' data = 'p'>P</button>
-        <button id='S' class = 'RPS' data = 's'>S</button>
-        <div id='YourChoice' hidden></div>
+        <button id='R' class = 'RPS' data = 'rock'>ROCK</button>
+        <button id='P' class = 'RPS' data = 'paper'>PAPER</button>
+        <button id='S' class = 'RPS' data = 'scissors'>SCISSORS</button>
     </div>
 
-    <div id='gameBox'></div>
+    <div id='gameBox'>
+        <div id ='P1Box' class ='playerBox'>
+            <div id='P1Name' class = 'name'>Player One:</div>
+            <img id='P1Image' src = '#' hidden>
+            <div id='P1Score' class='score'>WINS: 0</div>
+        </div>
+        <div id ='P2Box' class ='playerBox'>
+            <div id='P2Name' class = 'name'>Player Two:</div>
+            <img id='P2Image' src = '#' hidden>
+            <div id='P2Score' class='score'>WINS: 0</div>
+        </div>
+    </div>
     <div id='chatBox'>
         <div id ='chat'></div>
-        <input type='text' id='textBox'>
-        <button id='inputButton'>SEND</button>
+        <div id ='sendBox'>
+            <input type='text' id='textBox'>
+            <button id='inputButton'>SEND</button>
+        </div>
+        
     </div>
 
 
