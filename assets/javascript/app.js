@@ -85,13 +85,13 @@ database.ref('score').on('value',function(snapshot){
     $('#P2Score').html('WINS: ' + scoreObj.playerTwo)
 
     if (player == 1){
-        database.ref('choices').onDisconnect().set({
+        database.ref('score').onDisconnect().set({
             playerOne: 0,
             playerTwo: scoreObj.playerTwo,
         })
     }
     else{
-        database.ref('choices').onDisconnect().set({
+        database.ref('score').onDisconnect().set({
             playerOne: scoreObj.playerOne,
             playerTwo: 0,
         })
@@ -158,12 +158,18 @@ database.ref('choices').on('value',function(snapshot){
     choicesObj = snapshot.val()
     if (player==1 && choicesObj.playerOne!=''){
         $('#P1Image').removeAttr('hidden')
+        $('#P1Name').html(namesObj.playerOne + ': ' + choicesObj.playerOne.toUpperCase())
+
     }
     if (player==2 && choicesObj.playerTwo!=''){
         $('#P2Image').removeAttr('hidden')
+        $('#P2Name').html(namesObj.playerTwo + ': ' + choicesObj.playerTwo.toUpperCase())
+
     }
 
     if (choicesObj.playerOne != '' && choicesObj.playerTwo != ''){
+        $('#P2Name').html(namesObj.playerTwo + ': ' + choicesObj.playerTwo.toUpperCase())
+        $('#P1Name').html(namesObj.playerOne + ': ' + choicesObj.playerOne.toUpperCase())
         var victor = checkVictor(choicesObj.playerOne,choicesObj.playerTwo)
         if (victor == 0){
             $('#victor').html('TIE GAME')
