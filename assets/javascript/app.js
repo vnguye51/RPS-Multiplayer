@@ -4,7 +4,7 @@ var wins = 0;
 var losses = 0;
 var ties = 0;
 
-var player;
+var player = 0
 var playerObj = {
     playerOne: 0,
     playerTwo: 0
@@ -16,34 +16,44 @@ var choicesObj = {
 }
 
 var choice = ''
+var username = ''
 
-$(window).on('unload',(function(){
-    if (player == 1){
-        playerObj.playerOne = 0
-        choicesObj.playerOne = ''
-    }
-    else if (player == 2){
-        playerObj.playerTwo = 0
-        choicesObj.playerTwo = ''
-    }
+// $(window).on('unload',(function(){
+//     if (player == 1){
+//         playerObj.playerOne = 0
+//         choicesObj.playerOne = ''
+//     }
+//     else if (player == 2){
+//         playerObj.playerTwo = 0
+//         choicesObj.playerTwo = ''
+//     }
 
-}))
+// }))
 
 $('.choosePlayer').on('click',function(event){
+    $('#P1').attr('hidden',true)
+
     if(playerObj.playerOne == 0){
         player = 1
         playerObj.playerOne = 1
+        username =  $('#username').val() + '(Player1)'
         $('#playerDisplay').html('You are PLAYER ONE')
     }
     else if(playerObj.playerTwo == 0){
         player = 2
-        playerObj.playerTwo = 1
+        playerObj.playerTwo = 1 
+        username =  $('#username').val() + '(Player2)'
         $('#playerDisplay').html('You are PLAYER TWO')
     }
-    else{}//No more room for players
+    else{
+        username =  $('#username').val() + '(spectator)'
+    }//No more room for players
     
     $('.choosePlayer').attr('hidden',true)
-    $('#choiceBox').removeAttr('hidden')
+    if(player != 0){
+        $('#choiceBox').removeAttr('hidden')
+    }
+    $('#username').attr('hidden',true)
     database.ref('users').set(playerObj)
 
 })
@@ -63,6 +73,11 @@ $('.RPS').on('click',function(){
    
 })
 
+database.ref('chat').on('child_added',function(snapshot){
+    $('#chat').append(snapshot.val().msg)
+    $('#chat').append('<br>')
+})
+
 
 database.ref('choices').on('value',function(snapshot){
     choicesObj = snapshot.val()
@@ -70,10 +85,15 @@ database.ref('choices').on('value',function(snapshot){
         checkVictor(choicesObj.playerOne,choicesObj.playerTwo)
         choicesObj.playerOne = ''
         choicesObj.playerTwo = ''
-        $('.RPS').removeAttr('hidden')
         $('#YourChoice').attr('hidden',true)
         database.ref('choices').set(choicesObj)
+        if(player != 0){
+            console.log('a')
+            $('.RPS').removeAttr('hidden')
+        }
     }
+
+    
     if (player == 1){
         database.ref('choices').onDisconnect().set({
             playerOne: '',
@@ -102,16 +122,15 @@ database.ref('users').on('value', function(snapshot){
             playerTwo: 0,
         })
     }
-
-    if (playerObj.playerOne == 1 && playerObj.playerTwo == 1){
-        $('#P1').attr('hidden',true)
-    }
 })
 
 
 $('#inputButton').on('click',function(){
-    $('#chat').append($('#textBox').val())
-    $('#chat').append('<br>')
+    database.ref('chat').push({
+        msg: username + ': ' + $('#textBox').val()
+    })
+    // $('#chat').append($('#textBox').val())
+    // $('#chat').append('<br>')
 })
 
 
