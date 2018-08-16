@@ -74,7 +74,7 @@ $('.RPS').on('click',function(){
         choicesObj.playerTwo = choice
     }
     grabGiphy(choice,player)
-    $('#YourChoice').html('YOU CHOSE ' + choice).removeAttr('hidden')
+    // $('#YourChoice').html('YOU CHOSE ' + choice).removeAttr('hidden')
     $('.RPS').attr('hidden',true)
     database.ref('choices').set(choicesObj)
 })
@@ -143,7 +143,7 @@ database.ref('chat').on('child_added',function(snapshot){
    if (scrolled >= scrollHeight){
     $('#chat').append(snapshot.val().msg)
     $('#chat').append('<br>')
-    $('#chat').scrollTop($('#chat').prop('scrollHeight') - $('#chat').prop('offsetHeight'))
+    $('#chat').scrollTop($('#chat').prop('scrollHeight') - $('#chat').prop('offsetHeight')+10)
    }
    else{
     $('#chat').append(snapshot.val().msg)
@@ -209,7 +209,7 @@ database.ref('choices').on('value',function(snapshot){
             database.ref('images').set(imagesObj)
             $('#P2Image').attr('hidden',true)
             $('#P1Image').attr('hidden',true)
-            $('#YourChoice').attr('hidden',true)
+            // $('#YourChoice').attr('hidden',true)
             $('#victor').attr('hidden',true)
             
             if(player != 0){
