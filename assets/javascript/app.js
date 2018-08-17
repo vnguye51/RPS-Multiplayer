@@ -30,9 +30,12 @@ var namesObj = {
 }
 
 var scoreObj = {
-    playerOne: 0,
-    playerTwo: 0,
+    playerOneWins: 0,
+    playerTwoWins: 0,
+    playerOneLosses: 0,
+    playerTwoLosses: 0,
 }
+
 
 var input = $("#textBox"); //Add "enter" functionality to input fields
 input.on("keyup", function(event) {
@@ -111,20 +114,24 @@ $('.RPS').on('click',function(){
 //Update the player's  score
 database.ref('score').on('value',function(snapshot){
     scoreObj = snapshot.val()
-    $('#P1Score').html('WINS: ' + scoreObj.playerOne)
-    $('#P2Score').html('WINS: ' + scoreObj.playerTwo)
+    $('#P1Score').html('WINS: ' + scoreObj.playerOneWins + '<br> LOSSES: ' + scoreObj.playerOneLosses)
+    $('#P2Score').html('WINS: ' + scoreObj.playerTwoWins + '<br> LOSSES: ' + scoreObj.playerTwoLosses)
 
     //If a player disconnects reset their data on firebase
     if (player == 1){
         database.ref('score').onDisconnect().set({
-            playerOne: 0,
-            playerTwo: scoreObj.playerTwo,
+            playerOneWins: 0,
+            playerOneLosses: 0,
+            playerTwoWins: scoreObj.playerTwoWins,
+            playerTwoLosses: scoreObj.playerTwoLosses,
         })
     }
     else{
         database.ref('score').onDisconnect().set({
-            playerOne: scoreObj.playerOne,
-            playerTwo: 0,
+            playerOneWins: scoreObj.playerOneWins,
+            playerOneLosses: scoreObj.playerOneLosses,
+            playerTwoWins: 0,
+            playerTwoLosses: 0,
         })
     }
 })
@@ -226,10 +233,12 @@ database.ref('choices').on('value',function(snapshot){
             $('#victor').html('YOU LOSE')
         }
         if (victor == 1){
-            scoreObj.playerOne++
+            scoreObj.playerOneWins++
+            scoreObj.playerTwoLosses++
         }
         else if (victor == 2){
-            scoreObj.playerTwo++
+            scoreObj.playerTwoWins++
+            scoreObj.playerOneLosses++
         }
 
         database.ref('score').set(scoreObj)
