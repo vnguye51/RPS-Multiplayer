@@ -2,7 +2,7 @@ var database = firebase.database();
 
 var wins = 0;
 var losses = 0;
-var ties = 0;
+// var ties = 0;
 
 var player = 0
 var playerObj = {
@@ -34,6 +34,33 @@ var scoreObj = {
     playerTwo: 0,
 }
 
+var input = $("#textBox"); //Add "enter" functionality to input fields
+input.on("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        $('#inputButton').trigger('click')
+    }
+});
+
+var input = $("#username"); //Add "enter" functionality to input fields
+input.on("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        $('#P1').trigger('click')
+    }
+});
+
+
+//Send a new chat line to firebase
+$('#inputButton').on('click',function(){
+    database.ref('chat').push({
+        msg: username + ': ' + $('#textBox').val()
+    })
+    $('#textBox').val("")
+})
+
+
+//When a player joins the game assign them to player one, player two, or spectator
 $('.choosePlayer').on('click',function(event){
     $('#P1').attr('hidden',true)
 
@@ -59,12 +86,14 @@ $('.choosePlayer').on('click',function(event){
     if(player != 0){
         $('#choiceBox').removeAttr('hidden')
     }
+    $('#username').val("")
     $('#joinbox').attr('hidden',true)
     database.ref('users').set(playerObj)
     database.ref('names').set(namesObj)
 
 })
 
+//Upload the player's choice to firebase and show them an image based on their choice
 $('.RPS').on('click',function(){
     choice = $(this).attr('data')
     if (player == 1){
@@ -79,11 +108,13 @@ $('.RPS').on('click',function(){
     database.ref('choices').set(choicesObj)
 })
 
+//Update the player's  score
 database.ref('score').on('value',function(snapshot){
     scoreObj = snapshot.val()
     $('#P1Score').html('WINS: ' + scoreObj.playerOne)
     $('#P2Score').html('WINS: ' + scoreObj.playerTwo)
 
+    //If a player disconnects reset their data on firebase
     if (player == 1){
         database.ref('score').onDisconnect().set({
             playerOne: 0,
@@ -98,11 +129,13 @@ database.ref('score').on('value',function(snapshot){
     }
 })
 
+//Store a player's name
 database.ref('names').on('value',function(snapshot){
     namesObj = snapshot.val()
     $('#P1Name').html(namesObj.playerOne)
     $('#P2Name').html(namesObj.playerTwo)
 
+    //If a player disconnects reset their data on firebase
     if (player == 1){
         database.ref('names').onDisconnect().set({
             playerOne: '(Player1)',
@@ -117,6 +150,7 @@ database.ref('names').on('value',function(snapshot){
     }
 })
 
+//Store the randomly generated giphy image urls
 database.ref('images').on('value',function(snapshot){
     imagesObj = snapshot.val()
     $('#P1Image').attr('src',imagesObj.playerOne)
@@ -136,6 +170,8 @@ database.ref('images').on('value',function(snapshot){
     }
 })
 
+//Store the chat info I should probably have it only display the most recent~50 or images. 
+//Currently, it displays every message since the firebase was created
 database.ref('chat').on('child_added',function(snapshot){
     var scrolled = $('#chat').prop('scrollTop')
     var scrollHeight = $('#chat').prop('scrollHeight') - $('#chat').prop('offsetHeight')
@@ -153,7 +189,7 @@ database.ref('chat').on('child_added',function(snapshot){
 
 })
 
-
+//Store a players choice. 
 database.ref('choices').on('value',function(snapshot){
     choicesObj = snapshot.val()
     if (player==1 && choicesObj.playerOne!=''){
@@ -167,6 +203,7 @@ database.ref('choices').on('value',function(snapshot){
 
     }
 
+    //If both players have made a choice then determine the victor of the game and reset their values
     if (choicesObj.playerOne != '' && choicesObj.playerTwo != ''){
         $('#P2Name').html(namesObj.playerTwo + ': ' + choicesObj.playerTwo.toUpperCase())
         $('#P1Name').html(namesObj.playerOne + ': ' + choicesObj.playerOne.toUpperCase())
@@ -200,6 +237,8 @@ database.ref('choices').on('value',function(snapshot){
         $('#victor').removeAttr('hidden')
         $('#P2Image').removeAttr('hidden')
         $('#P1Image').removeAttr('hidden')
+
+        //Might be some desync issues here. If errors occur check here first.
         setTimeout(function(){
             choicesObj.playerOne = ''
             choicesObj.playerTwo = ''
@@ -209,7 +248,6 @@ database.ref('choices').on('value',function(snapshot){
             database.ref('images').set(imagesObj)
             $('#P2Image').attr('hidden',true)
             $('#P1Image').attr('hidden',true)
-            // $('#YourChoice').attr('hidden',true)
             $('#victor').attr('hidden',true)
             
             if(player != 0){
@@ -233,6 +271,7 @@ database.ref('choices').on('value',function(snapshot){
     }
 })
 
+//Store which players have joined the match
 database.ref('users').on('value', function(snapshot){
     playerObj = snapshot.val()
     if (player == 1){
@@ -250,12 +289,7 @@ database.ref('users').on('value', function(snapshot){
 })
 
 
-$('#inputButton').on('click',function(){
-    database.ref('chat').push({
-        msg: username + ': ' + $('#textBox').val()
-    })
 
-})
 
 
 function checkVictor(choice1,choice2){
